@@ -1,0 +1,32 @@
+resources:
+    jobs:
+        CineData_Analytics_Pipeline:
+            name: CineData_Analytics_Pipeline
+            schedule:
+                quartz_cron_expression: 47 0 6 * * ?
+                timezone_id: America/Sao_Paulo
+                pause_status: UNPAUSED
+            tasks:
+                - task_key: to_Bronze
+                  notebook_task:
+                      notebook_path: /Workspace/Users/miltonsalgadoleandro@gmail.com/CineData_Analytics/Landing_to_Bronze
+                      base_parameters:
+                          reset_bronze: "false"
+                          data_inicio: ""
+                          data_fim: ""
+                      source: WORKSPACE
+                - task_key: to_Silver
+                  depends_on:
+                      - task_key: to_Bronze
+                  notebook_task:
+                      notebook_path: /Workspace/Users/miltonsalgadoleandro@gmail.com/CineData_Analytics/Bronze_to_Silver
+                      source: WORKSPACE
+                - task_key: to_Gold
+                  depends_on:
+                      - task_key: to_Silver
+                  notebook_task:
+                      notebook_path: /Workspace/Users/miltonsalgadoleandro@gmail.com/CineData_Analytics/Silver_to_Gold
+                      source: WORKSPACE
+            queue:
+                enabled: true
+            performance_target: PERFORMANCE_OPTIMIZED
